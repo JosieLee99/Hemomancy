@@ -7,6 +7,8 @@ public class NoiseGrid : MonoBehaviour
 {
     public GameObject player;
 
+    public TileTest tileTest;
+
     public int mapWidth;
     public int mapHeight;
 
@@ -18,6 +20,8 @@ public class NoiseGrid : MonoBehaviour
     public int densityPercOne;
     public int densityPercTwo;
 
+    public bool worldGenerated;
+
     public Tile grass;
     public Tile stone;
     public Tile water;
@@ -26,9 +30,18 @@ public class NoiseGrid : MonoBehaviour
 
     void Start()
     {
-        //MakeNoiseGrid(densityPercOne);
-        //Smooth(iterations);
-        //MakePonds(densityPercTwo);
+        if (!PlayerPrefs.HasKey("WorldGenerated"))
+        {
+            MakeNoiseGrid(densityPercOne);
+            Smooth(iterations);
+            MakePonds(densityPercTwo);
+
+            PlayerPrefs.SetInt("WorldGenerated", 1);
+        }
+        else
+        {
+            tileTest.Load();
+        }
 
         player.transform.position = new Vector3(mapWidth / 2, mapHeight / 2, 0);
     }

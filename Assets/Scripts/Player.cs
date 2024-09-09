@@ -4,50 +4,35 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private bool isMoving;
-    private Vector3 originalPos;
-    private Vector3 targetPos;
-    private float timeToMove = 0.2f;
+    CharacterState currentState;
+
+    public IdleState idleState = new IdleState();
+    public MovingState movingState = new MovingState();
+
+    public LayerMask whatStopsMovement;
+
+    public Transform movePoint;
+
+    void Start()
+    {
+        currentState = idleState;
+
+        currentState.EnterState(this);
+    }
+
+    public void SwitchState(CharacterState state)
+    {
+        currentState = state;
+        state.EnterState(this);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        currentState.OnCollisionEnter2D(this);
+    }
 
     void Update()
     {
-        if(Input.GetKey(KeyCode.W) && !isMoving)
-        {
-            StartCoroutine(MovePlayer(Vector3.up));
-        }
-        if (Input.GetKey(KeyCode.A) && !isMoving)
-        {
-            StartCoroutine(MovePlayer(Vector3.left));
-        }
-        if (Input.GetKey(KeyCode.S) && !isMoving)
-        {
-            StartCoroutine(MovePlayer(Vector3.down));
-        }
-        if (Input.GetKey(KeyCode.D) && !isMoving)
-        {
-            StartCoroutine(MovePlayer(Vector3.right));
-        }
-    }
-
-    private IEnumerator MovePlayer(Vector3 direction)
-    {
-        isMoving = true;
-
-        float elapsedTime = 0;
-
-        originalPos = transform.position;
-        targetPos = originalPos + direction;
-
-        while(elapsedTime < timeToMove)
-        {
-            transform.position = Vector3.Lerp(originalPos, targetPos, (elapsedTime / timeToMove));
-            elapsedTime += Time.deltaTime;
-
-            yield return null;
-        }
-
-        transform.position = targetPos;
-
-        isMoving = false;
+        currentState.UpdateState(this);
     }
 }
