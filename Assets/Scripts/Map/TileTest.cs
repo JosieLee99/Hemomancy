@@ -20,6 +20,8 @@ public class TileTest : MonoBehaviour
     public Tile stoneStripVerticalTile;
     public Tile stoneLeftCornerTile;
     public Tile stoneRightCornerTile;
+    public Tile stoneLeftStraightRightCornerTile;
+    public Tile stoneRightStraightLeftCornerTile;
 
     public TileBase waterTile;
 
@@ -154,6 +156,14 @@ public class TileTest : MonoBehaviour
                 if (tile.name == "Stone_Right_Corner")
                 {
                     tiles.Add(stoneRightCornerTile);
+                }
+                if (tile.name == "Stone_LeftSraight_RightCorner")
+                {
+                    tiles.Add(stoneLeftStraightRightCornerTile);
+                }
+                if (tile.name == "Stone_RightSraight_LeftCorner")
+                {
+                    tiles.Add(stoneRightStraightLeftCornerTile);
                 }
                 if (tile.name == "Water")
                 {

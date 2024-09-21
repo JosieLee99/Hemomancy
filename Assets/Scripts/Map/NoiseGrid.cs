@@ -31,6 +31,8 @@ public class NoiseGrid : MonoBehaviour
     public Tile grass3;
     public Tile grass4;
 
+    public Tile black;
+
     public Tile stone;
     public Tile stoneBottom;
     public Tile stoneRight;
@@ -41,6 +43,9 @@ public class NoiseGrid : MonoBehaviour
     public Tile stoneStripVertical;
     public Tile stoneLeftCorner;
     public Tile stoneRightCorner;
+    public Tile stoneBothCorner;
+    public Tile stoneLeftStraightRightCorner;
+    public Tile stoneRightStraightLeftCorner;
 
     public bool tileUp;
     public bool tileRight;
@@ -76,6 +81,8 @@ public class NoiseGrid : MonoBehaviour
         stones.Add(stoneStripVertical);
         stones.Add(stoneLeftCorner);
         stones.Add(stoneRightCorner);
+        stones.Add(stoneLeftStraightRightCorner);
+        stones.Add(stoneRightStraightLeftCorner);
 
         if (!PlayerPrefs.HasKey("WorldGenerated"))
         {
@@ -380,10 +387,59 @@ public class NoiseGrid : MonoBehaviour
                             tilemap.SetTile(new Vector3Int(i, j, 0), stoneStripVertical);
                         }
 
-                        //Left Corner
-                        else if (tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == stoneBottomRight && tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == stoneRight || tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == stoneBottomRight && tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == stoneBottomRight || tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == stoneBottom && tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == stoneBottomRight || tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == stoneBottom && tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == stoneRight)
+                        //Middle
+                        else
                         {
-                            Debug.Log("PLEASE");
+                            tilemap.SetTile(new Vector3Int(i, j, 0), stone);
+                        }
+
+                        //Debug.Log(tilemap.GetTile(new Vector3Int(i + 1, j, 0)));
+                    }
+                }
+            }
+        }
+
+        //Pass 2
+
+        for (int i = 0; i < mapWidth; i++)
+        {
+            for (int j = 0; j < mapHeight; j++)
+            {
+                foreach (TileBase isStone in stones)
+                {
+                    if (tilemap.GetTile(new Vector3Int(i, j, 0)) == isStone)
+                    {
+                        tileUp = false;
+                        tileRight = false;
+                        tileDown = false;
+                        tileLeft = false;
+                        
+                        foreach (TileBase tile in stones)
+                        {
+                            if (tilemap.GetTile(new Vector3Int(i, j + 1, 0)) == tile && tileUp == false || tilemap.GetTile(new Vector3Int(i, j + 1, 0)) == black && tileUp == false)
+                            {
+                                tileUp = true;
+                            }
+                        
+                            if (tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == tile && tileRight == false || tilemap.GetTile(new Vector3Int(i + 1, j , 0)) == black && tileRight == false)
+                            {
+                                tileRight = true;
+                            }
+                        
+                            if (tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == tile && tileDown == false || tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == black && tileDown == false)
+                            {
+                                tileDown = true;
+                            }
+                        
+                            if (tilemap.GetTile(new Vector3Int(i - 1, j, 0)) == tile && tileLeft == false || tilemap.GetTile(new Vector3Int(i - 1, j, 0)) == black && tileLeft == false)
+                            {
+                                tileLeft = true;
+                            }
+                        }
+
+                        //Left Corner
+                        if (tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == stoneBottomRight && tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == stoneRight || tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == stoneBottomRight && tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == stoneBottomRight || tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == stoneBottom && tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == stoneBottomRight || tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == stoneBottom && tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == stoneRight)
+                        {
                             tilemap.SetTile(new Vector3Int(i, j, 0), stoneLeftCorner);
                         }
 
@@ -393,434 +449,38 @@ public class NoiseGrid : MonoBehaviour
                             tilemap.SetTile(new Vector3Int(i, j, 0), stoneRightCorner);
                         }
 
-                        //Middle
-                        else
+                        //Both Corner
+                        else if (tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == stoneBottomSingle && tileLeft == true && tileRight == true)
                         {
-                            tilemap.SetTile(new Vector3Int(i, j, 0), stone);
+                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneBothCorner);
+                        }
+
+                        //Left Straight Right Corner
+                        else if (tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == stoneBottomSingle && tileLeft == false && tileRight == true)
+                        {
+                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneLeftStraightRightCorner);
+                        }
+
+                        //Right Straight Left Corner
+                        else if (tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == stoneBottomSingle && tileLeft == true && tileRight == false)
+                        {
+                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneRightStraightLeftCorner);
+                        }
+
+                        else if (tileUp == true && tileRight == true && tileDown == true && tileLeft == true)
+                        {
+                            tilemap.SetTile(new Vector3Int(i, j, 0), black);
+                        }
+
+                        else if (tilemap.GetTile(new Vector3Int(i, j, 0)) == stone && tileUp == true)
+                        {
+                            tilemap.SetTile(new Vector3Int(i, j, 0), black);
                         }
                     }
                 }
             }
         }
-
-        //Pass 2
-
-        //for (int i = 0; i < mapWidth; i++)
-        //{
-        //    for (int j = 0; j < mapHeight; j++)
-        //    {
-        //        tileUp = false;
-        //        tileRight = false;
-        //        tileDown = false;
-        //        tileLeft = false;
-        //
-        //        foreach (TileBase tile in stones)
-        //        {
-        //            if (tilemap.GetTile(new Vector3Int(i, j + 1, 0)) == tile && tileUp == false)
-        //            {
-        //                tileUp = true;
-        //            }
-        //
-        //            if (tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == tile && tileRight == false)
-        //            {
-        //                tileRight = true;
-        //            }
-        //
-        //            if (tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == tile && tileDown == false)
-        //            {
-        //                tileDown = true;
-        //            }
-        //
-        //            if (tilemap.GetTile(new Vector3Int(i - 1, j, 0)) == tile && tileLeft == false)
-        //            {
-        //                tileLeft = true;
-        //            }
-        //        }
-        //
-        //        //Bottom Left
-        //        if (tileUp == true && tileDown == false && tileLeft == false && tileRight == true)
-        //        {
-        //            tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottomLeft);
-        //        }
-        //
-        //        //Bottom Right
-        //        if (tileUp == true && tileDown == false && tileLeft == true && tileRight == false)
-        //        {
-        //            tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottomRight);
-        //        }
-        //    }
-        //}
-
-
-
-                //    for (int i = 0; i < mapWidth; i++)
-                //    {
-                //        for (int j = 0; j < mapHeight; j++)
-                //        {
-                //            tileUp = false;
-                //            tileRight = false;
-                //            tileDown = false;
-                //            tileLeft = false;
-                //
-                //            foreach (TileBase tile in stones)
-                //            {
-                //                if (tilemap.GetTile(new Vector3Int(i, j + 1, 0)) == tile && tileUp == false)
-                //                {
-                //                    tileUp = true;
-                //                }
-                //
-                //                if (tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == tile && tileRight == false)
-                //                {
-                //                    tileRight = true;
-                //                }
-                //
-                //                if (tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == tile && tileDown == false)
-                //                {
-                //                    tileDown = true;
-                //                }
-                //
-                //                if (tilemap.GetTile(new Vector3Int(i - 1, j, 0)) == tile && tileLeft == false)
-                //                {
-                //                    tileLeft = true;
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == false)
-                //                {
-                //                    if (tileDown == false)
-                //                    {
-                //                        if (tileLeft == false)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottomSingle);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == false)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottom);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == true)
-                //                    {
-                //                        if (tileLeft == false)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneLeft);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == false)
-                //                {
-                //                    if (tileDown == true)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneRight);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == false)
-                //            {
-                //                if (tileRight == false)
-                //                {
-                //                    if (tileDown == true)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneRight);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == false)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == true)
-                //                    {
-                //                        if (tileLeft == false)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneLeft);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == false)
-                //                    {
-                //                        if (tileLeft == false)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottomLeft);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == false)
-                //                {
-                //                    if (tileDown == false)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottomRight);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == false)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottom);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //        }
-                //    }
-                //
-                //    for (int i = 0; i < mapWidth; i++)
-                //    {
-                //        for (int j = 0; j < mapHeight; j++)
-                //        {
-                //            tileUp = false;
-                //            tileRight = false;
-                //            tileDown = false;
-                //            tileLeft = false;
-                //
-                //            foreach (TileBase tile in stones)
-                //            {
-                //                if (tilemap.GetTile(new Vector3Int(i, j + 1, 0)) == tile && tileUp == false)
-                //                {
-                //                    tileUp = true;
-                //                }
-                //
-                //                if (tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == tile && tileRight == false)
-                //                {
-                //                    tileRight = true;
-                //                }
-                //
-                //                if (tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == tile && tileDown == false)
-                //                {
-                //                    tileDown = true;
-                //                }
-                //
-                //                if (tilemap.GetTile(new Vector3Int(i - 1, j, 0)) == tile && tileLeft == false)
-                //                {
-                //                    tileLeft = true;
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == false)
-                //                    {
-                //                        if (tileLeft == false)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottomLeft);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == false)
-                //                {
-                //                    if (tileDown == false)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottomRight);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == true)
-                //                    {
-                //                        if (tileLeft == false)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneLeft);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == false)
-                //                {
-                //                    if (tileDown == true)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneRight);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == false)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottom);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == false)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == true)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stone);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == true)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stone);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //        }
-                //    }
-                //
-                //    for (int i = 0; i < mapWidth; i++)
-                //    {
-                //        for (int j = 0; j < mapHeight; j++)
-                //        {
-                //            tileUp = false;
-                //            tileRight = false;
-                //            tileDown = false;
-                //            tileLeft = false;
-                //
-                //            foreach (TileBase tile in stones)
-                //            {
-                //                if (tilemap.GetTile(new Vector3Int(i, j + 1, 0)) == tile && tileUp == false)
-                //                {
-                //                    tileUp = true;
-                //                }
-                //
-                //                if (tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == tile && tileRight == false)
-                //                {
-                //                    tileRight = true;
-                //                }
-                //
-                //                if (tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == tile && tileDown == false)
-                //                {
-                //                    tileDown = true;
-                //                }
-                //
-                //                if (tilemap.GetTile(new Vector3Int(i - 1, j, 0)) == tile && tileLeft == false)
-                //                {
-                //                    tileLeft = true;
-                //                }
-                //            }
-                //
-                //            if (tileUp == false)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == true)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stone);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == true)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stone);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //
-                //            if (tileUp == true)
-                //            {
-                //                if (tileRight == true)
-                //                {
-                //                    if (tileDown == false)
-                //                    {
-                //                        if (tileLeft == true)
-                //                        {
-                //                            tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottom);
-                //                        }
-                //                    }
-                //                }
-                //            }
-                //        }
-                //    }
-            }
+    }
 
     public void FinalRevisions()
     {
