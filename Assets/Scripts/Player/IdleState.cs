@@ -17,12 +17,17 @@ public class IdleState : CharacterState
         {
             if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
             {
-                //Debug.Log("Entering Idle State");
                 player.SwitchState(player.movingState);
             }
         }
 
-        if(Input.GetKeyDown(KeyCode.Tab))
+        //if (!Input.GetKey(KeyCode.Q))
+        //{
+        //        player.SwitchState(player.movingState)
+        //    }
+        //}
+
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
             player.SwitchState(player.attackState);
         }

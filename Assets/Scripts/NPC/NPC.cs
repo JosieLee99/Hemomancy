@@ -10,8 +10,8 @@ public class NPC : MonoBehaviour
     public NPCMovingState npcMovingState = new NPCMovingState();
     public NPCAttackState npcAttackState = new NPCAttackState();
 
-    public Node currentNode;
-    public List<Node> path = new List<Node>();
+    //public Node currentNode;
+    public List<Vector2> path = new List<Vector2>();
 
     public WorldManager worldManager;
 
@@ -42,19 +42,14 @@ public class NPC : MonoBehaviour
     {
         currentState.UpdateState(this);
 
-        Node[] nodes = FindObjectsOfType<Node>();
-
-        while (path == null || path.Count == 0)
-        {
-            path = AStarManager.Instance.GeneratePath(currentNode, nodes[Random.Range(0, nodes.Length - 1)]);
-        }
+        //Node[] nodes = FindObjectsOfType<Node>();
     }
 
-    public void OnTriggerEnter2D(Collider2D collider)
-    {
-        if (collider.gameObject.tag == "Node")
-        {
-            currentNode = collider.gameObject.GetComponent<Node>();
-        }
-    }
+    //public void OnTriggerEnter2D(Collider2D collider)
+    //{
+    //    if (collider.gameObject.tag == "Node")
+    //    {
+    //        currentNode = collider.gameObject.GetComponent<Node>();
+    //    }
+    //}
 }

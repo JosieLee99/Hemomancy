@@ -96,7 +96,7 @@ public class NoiseGrid : MonoBehaviour
             InitializeStartingArea();
             RedoStone();
             //FinalRevisions();
-            randomWalkerGenerator.CreateNodes();
+            //randomWalkerGenerator.CreateNodes();
             //CreateNodes();
             AddColliders(wallCollider);
 
@@ -112,11 +112,11 @@ public class NoiseGrid : MonoBehaviour
             InitializeStartingArea();
             RedoStone();
             //FinalRevisions();
-            randomWalkerGenerator.CreateNodes();
+            //randomWalkerGenerator.CreateNodes();
             AddColliders(wallCollider);
         }
 
-        randomWalkerGenerator = FindObjectOfType<RandomWalkerGenerator>();
+        //randomWalkerGenerator = FindObjectOfType<RandomWalkerGenerator>();
 
         player.transform.position = new Vector3(mapWidth / 2, mapHeight / 2, 0);
     }
@@ -145,7 +145,7 @@ public class NoiseGrid : MonoBehaviour
             InitializeStartingArea();
             RedoStone();
             //FinalRevisions();
-            randomWalkerGenerator.CreateNodes();
+            //randomWalkerGenerator.CreateNodes();
             //CreateNodes();
             AddColliders(wallCollider);
 
@@ -482,102 +482,6 @@ public class NoiseGrid : MonoBehaviour
         }
     }
 
-    public void FinalRevisions()
-    {
-    //    for (int i = 0; i < mapWidth; i++)
-    //    {
-    //        for (int j = 0; j < mapHeight; j++)
-    //        {
-    //            if (tilemap.GetTile(new Vector3Int(i, j, 0)) == stoneBottomSingle)
-    //            {
-    //                tileUp = false;
-    //                tileRight = false;
-    //                tileDown = false;
-    //                tileLeft = false;
-    //
-    //                foreach (TileBase tile in stones)
-    //                {
-    //                    if (tilemap.GetTile(new Vector3Int(i, j + 1, 0)) == tile && tileUp == false)
-    //                    {
-    //                        tileUp = true;
-    //                    }
-    //
-    //                    if (tilemap.GetTile(new Vector3Int(i + 1, j, 0)) == tile && tileRight == false)
-    //                    {
-    //                        tileRight = true;
-    //                    }
-    //
-    //                    if (tilemap.GetTile(new Vector3Int(i, j - 1, 0)) == tile && tileDown == false)
-    //                    {
-    //                        tileDown = true;
-    //                    }
-    //
-    //                    if (tilemap.GetTile(new Vector3Int(i - 1, j, 0)) == tile && tileLeft == false)
-    //                    {
-    //                        tileLeft = true;
-    //                    }
-    //                }
-    //
-    //                if (tileUp == true)
-    //                {
-    //                    if (tileRight == true)
-    //                    {
-    //                        if (tileDown == true)
-    //                        {
-    //                            if (tileLeft == false)
-    //                            {
-    //                                tilemap.SetTile(new Vector3Int(i, j, 0), stoneLeft);
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //
-    //                if (tileUp == true)
-    //                {
-    //                    if (tileRight == false)
-    //                    {
-    //                        if (tileDown == true)
-    //                        {
-    //                            if (tileLeft == true)
-    //                            {
-    //                                tilemap.SetTile(new Vector3Int(i, j, 0), stoneRight);
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //
-    //                if (tileUp == true)
-    //                {
-    //                    if (tileRight == true)
-    //                    {
-    //                        if (tileDown == false)
-    //                        {
-    //                            if (tileLeft == false)
-    //                            {
-    //                                tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottomLeft);
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //
-    //                if (tileUp == true)
-    //                {
-    //                    if (tileRight == true)
-    //                    {
-    //                        if (tileDown == false)
-    //                        {
-    //                            if (tileLeft == true)
-    //                            {
-    //                                tilemap.SetTile(new Vector3Int(i, j, 0), stoneBottom);
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    }
-
     public void InitializeStartingArea()
     {
         for (int i = 47; i <= 53; i++)
@@ -622,22 +526,22 @@ public class NoiseGrid : MonoBehaviour
         }
     }
 
-    public void CreateNodes()
-    {
-        for (int i = 0; i < mapWidth; i++)
-        {
-            for (int j = 0; j < mapHeight; j++)
-            {
-                if(tilemap.GetTile(new Vector3Int(i, j, 0)) == grass1 || tilemap.GetTile(new Vector3Int(i, j, 0)) == grass2 || tilemap.GetTile(new Vector3Int(i, j, 0)) == grass3)
-                {
-                    Node node = Instantiate(randomWalkerGenerator.nodePrefab, new Vector2(i, j), Quaternion.identity);
-                    randomWalkerGenerator.nodeList.Add(node);
-                }
-            }
-        }
-
-        randomWalkerGenerator.CreateConnections();
-    }
+    //public void CreateNodes()
+    //{
+    //    for (int i = 0; i < mapWidth; i++)
+    //    {
+    //        for (int j = 0; j < mapHeight; j++)
+    //        {
+    //            if(tilemap.GetTile(new Vector3Int(i, j, 0)) == grass1 || tilemap.GetTile(new Vector3Int(i, j, 0)) == grass2 || tilemap.GetTile(new Vector3Int(i, j, 0)) == grass3)
+    //            {
+    //                Node node = Instantiate(randomWalkerGenerator.nodePrefab, new Vector2(i, j), Quaternion.identity);
+    //                randomWalkerGenerator.nodeList.Add(node);
+    //            }
+    //        }
+    //    }
+    //
+    //    randomWalkerGenerator.CreateConnections();
+    //}
 
     public void DestroyMap()
     {
@@ -654,6 +558,13 @@ public class NoiseGrid : MonoBehaviour
             }
         }
 
-        randomWalkerGenerator.DestroyNodes();
+        GameObject[] colliders = GameObject.FindGameObjectsWithTag("WallCollider");
+
+        foreach (GameObject collider in colliders)
+        {
+            Destroy(collider);
+        }
+
+        //randomWalkerGenerator.DestroyNodes();
     }
 }
