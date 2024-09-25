@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using UnityEngine.Tilemaps;
 using UnityEngine;
 
-public class NoiseGrid : MonoBehaviour
+public class InitializeMap : MonoBehaviour
 {
     public GameObject player;
 
-    public RandomWalkerGenerator randomWalkerGenerator;
+    public static InitializeMap Instance;
 
-    public static NoiseGrid Instance = null;
-
-    public TileTest tileTest;
+    public SaveLoadMap saveLoadMap;
 
     public int mapWidth;
     public int mapHeight;
@@ -23,8 +21,6 @@ public class NoiseGrid : MonoBehaviour
 
     public int densityPercOne;
     public int densityPercTwo;
-
-    public bool worldGenerated;
 
     public Tile grass1;
     public Tile grass2;
@@ -60,6 +56,8 @@ public class NoiseGrid : MonoBehaviour
 
     public Tilemap tilemap;
 
+    public GameObject square;
+
     void Start()
     {
         if(!Instance)
@@ -84,82 +82,86 @@ public class NoiseGrid : MonoBehaviour
         stones.Add(stoneLeftStraightRightCorner);
         stones.Add(stoneRightStraightLeftCorner);
 
-        if (!PlayerPrefs.HasKey("WorldGenerated"))
-        {
-            DestroyMap();
+        square.SetActive(true);
 
-            MakeNoiseGrid(densityPercOne);
-            Smooth(iterations);
-            MakePonds(densityPercTwo);
-            //RedoStone();
-            //FinalRevisions();
-            InitializeStartingArea();
-            RedoStone();
-            //FinalRevisions();
-            //randomWalkerGenerator.CreateNodes();
-            //CreateNodes();
-            AddColliders(wallCollider);
-
-            PlayerPrefs.SetInt("WorldGenerated", 1);
-        }
-        else
-        {
-            ES3AutoSaveMgr.Current.Load();
-            tileTest.Load();
-
-            //RedoStone();
-            //FinalRevisions();
-            InitializeStartingArea();
-            RedoStone();
-            //FinalRevisions();
-            //randomWalkerGenerator.CreateNodes();
-            AddColliders(wallCollider);
-        }
-
-        //randomWalkerGenerator = FindObjectOfType<RandomWalkerGenerator>();
+        //if (!PlayerPrefs.HasKey("WorldGenerated"))
+        //{
+        //    Debug.Log("First World");
+        //    DestroyMap();
+        //
+        //    MakeNoiseGrid(densityPercOne);
+        //    Smooth(iterations);
+        //    MakePonds(densityPercTwo);
+        //    InitializeStartingArea();
+        //    RedoStone();
+        //    AddColliders(wallCollider);
+        //
+        //    PlayerPrefs.SetInt("WorldGenerated", 1);
+        //
+        //    saveLoadMap.Save();
+        //}
+        //else
+        //{
+        //    Debug.Log("Reloading World");
+        //    //ES3AutoSaveMgr.Current.Load();
+        //    saveLoadMap.Load();
+        //
+        //    InitializeStartingArea();
+        //    RedoStone();
+        //    AddColliders(wallCollider);
+        //
+        //    square.SetActive(false);
+        //}
 
         player.transform.position = new Vector3(mapWidth / 2, mapHeight / 2, 0);
     }
-
-    //public void Start()
-    //{
-    //    GameObject[] wallColliders = GameObject.FindGameObjectsWithTag("DeleteThis");
-    //
-    //    foreach(GameObject wall in wallColliders)
-    //    {
-    //        Destroy(wall);
-    //    }
-    //}
 
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            DestroyMap();
+            if (!PlayerPrefs.HasKey("WorldGenerated"))
+            {
+                Debug.Log("First World");
+                DestroyMap();
 
-            MakeNoiseGrid(densityPercOne);
-            Smooth(iterations);
-            MakePonds(densityPercTwo);
-            //RedoStone();
-            //FinalRevisions();
-            InitializeStartingArea();
-            RedoStone();
-            //FinalRevisions();
-            //randomWalkerGenerator.CreateNodes();
-            //CreateNodes();
-            AddColliders(wallCollider);
+                MakeNoiseGrid(densityPercOne);
+                Smooth(iterations);
+                MakePonds(densityPercTwo);
+                InitializeStartingArea();
+                RedoStone();
+                AddColliders(wallCollider);
 
-            PlayerPrefs.SetInt("WorldGenerated", 1);
+                saveLoadMap.Save();
+
+                AStarManager.Instance.StartPathfinding();
+
+                PlayerPrefs.SetInt("WorldGenerated", 1);
+            }
+            else
+            {
+                Debug.Log("Reloading World");
+                //ES3AutoSaveMgr.Current.Load();
+                saveLoadMap.Load();
+
+                InitializeStartingArea();
+                RedoStone();
+                AddColliders(wallCollider);
+
+                AStarManager.Instance.StartPathfinding();
+
+                square.SetActive(false);
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            PlayerPrefs.DeleteAll();
         }
 
         if (Input.GetKeyDown(KeyCode.J))
         {
             DestroyMap();
-        }
-
-        if(Input.GetKeyDown(KeyCode.Y))
-        {
-            InitializeStartingArea();
         }
     }
 
@@ -243,7 +245,6 @@ public class NoiseGrid : MonoBehaviour
                     else
                     {
                         tilemap.SetTile(new Vector3Int(i, j, 0), stone);
-                        //Instantiate(wallCollider, new Vector3(i, j, 0), Quaternion.identity);
                     }
                     grassCount = 0;
                     stoneCount = 0;
@@ -392,8 +393,6 @@ public class NoiseGrid : MonoBehaviour
                         {
                             tilemap.SetTile(new Vector3Int(i, j, 0), stone);
                         }
-
-                        //Debug.Log(tilemap.GetTile(new Vector3Int(i + 1, j, 0)));
                     }
                 }
             }
@@ -526,23 +525,6 @@ public class NoiseGrid : MonoBehaviour
         }
     }
 
-    //public void CreateNodes()
-    //{
-    //    for (int i = 0; i < mapWidth; i++)
-    //    {
-    //        for (int j = 0; j < mapHeight; j++)
-    //        {
-    //            if(tilemap.GetTile(new Vector3Int(i, j, 0)) == grass1 || tilemap.GetTile(new Vector3Int(i, j, 0)) == grass2 || tilemap.GetTile(new Vector3Int(i, j, 0)) == grass3)
-    //            {
-    //                Node node = Instantiate(randomWalkerGenerator.nodePrefab, new Vector2(i, j), Quaternion.identity);
-    //                randomWalkerGenerator.nodeList.Add(node);
-    //            }
-    //        }
-    //    }
-    //
-    //    randomWalkerGenerator.CreateConnections();
-    //}
-
     public void DestroyMap()
     {
         for (int i = 0; i < 100; i++)
@@ -550,11 +532,6 @@ public class NoiseGrid : MonoBehaviour
             for (int j = 0; j < 100; j++)
             {
                 tilemap.SetTile(new Vector3Int(i, j, 0), null);
-
-                //foreach (Node node in randomWalkerGenerator.nodeList)
-                //{
-                //    Destroy(node);
-                //}
             }
         }
 
@@ -564,7 +541,5 @@ public class NoiseGrid : MonoBehaviour
         {
             Destroy(collider);
         }
-
-        //randomWalkerGenerator.DestroyNodes();
     }
 }

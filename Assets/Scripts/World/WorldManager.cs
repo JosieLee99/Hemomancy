@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WorldManager : MonoBehaviour
 {
-    WorldState currentState;
+    public WorldState currentState;
 
     public PlayerTurnState playerTurnState = new PlayerTurnState();
     public NPCTurnState npcTurnState = new NPCTurnState();

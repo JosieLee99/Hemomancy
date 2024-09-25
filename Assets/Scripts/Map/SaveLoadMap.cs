@@ -3,12 +3,13 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Collections.Generic;
 
-public class TileTest : MonoBehaviour
+public class SaveLoadMap : MonoBehaviour
 {
     public TileBase grassTile1;
     public TileBase grassTile2;
     public TileBase grassTile3;
-    public TileBase grassTile4;
+
+    public TileBase blackTile;
 
     public Tile stoneTile;
     public Tile stoneBottomTile;
@@ -34,13 +35,13 @@ public class TileTest : MonoBehaviour
 
     public void Awake()
     {
-        ES3AutoSaveMgr.Current.Load();
-        Load();
+        //ES3AutoSaveMgr.Current.Load();
+        //Load();
     }
 
     void OnApplicationQuit()
     {
-        ES3AutoSaveMgr.Current.Save();
+        //ES3AutoSaveMgr.Current.Save();
 
         Save();
     }
@@ -113,9 +114,9 @@ public class TileTest : MonoBehaviour
                 {
                     tiles.Add(grassTile3);
                 }
-                if (tile.name == "Grass4")
+                if (tile.name == "BlackTile")
                 {
-                    tiles.Add(grassTile4);
+                    tiles.Add(blackTile);
                 }
                 if (tile.name == "Stone")
                 {

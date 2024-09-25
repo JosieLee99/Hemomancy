@@ -6,25 +6,22 @@ public class IdleState : CharacterState
 {
     public override void EnterState(Player player)
     {
-        //Debug.Log("Entering Idle State");
+
     }
 
     public override void UpdateState(Player player, WorldManager worldManager)
     {
         SetDirectionWithoutMovement(player);
 
-        if (!Input.GetKey(KeyCode.LeftShift))
-        {
-            if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
-            {
-                player.SwitchState(player.movingState);
-            }
-        }
-
-        //if (!Input.GetKey(KeyCode.Q))
+        //if (worldManager.currentState == worldManager.playerTurnState)
         //{
-        //        player.SwitchState(player.movingState)
-        //    }
+            if (!Input.GetKey(KeyCode.LeftShift))
+            {
+                if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+                {
+                    player.SwitchState(player.movingState);
+                }
+            }
         //}
 
         if (Input.GetKeyDown(KeyCode.Tab))

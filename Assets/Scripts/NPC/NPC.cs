@@ -10,7 +10,6 @@ public class NPC : MonoBehaviour
     public NPCMovingState npcMovingState = new NPCMovingState();
     public NPCAttackState npcAttackState = new NPCAttackState();
 
-    //public Node currentNode;
     public List<Vector2> path = new List<Vector2>();
 
     public WorldManager worldManager;
@@ -24,13 +23,13 @@ public class NPC : MonoBehaviour
 
         currentState = npcIdleState;
 
-        currentState.EnterState(this, player);
+        currentState.EnterState(this, player, worldManager);
     }
 
     public void SwitchState(NPCState state)
     {
         currentState = state;
-        state.EnterState(this, player);
+        state.EnterState(this, player, worldManager);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -38,18 +37,8 @@ public class NPC : MonoBehaviour
         currentState.OnCollisionEnter2D(this);
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        currentState.UpdateState(this);
-
-        //Node[] nodes = FindObjectsOfType<Node>();
+        currentState.UpdateState(this, worldManager);
     }
-
-    //public void OnTriggerEnter2D(Collider2D collider)
-    //{
-    //    if (collider.gameObject.tag == "Node")
-    //    {
-    //        currentNode = collider.gameObject.GetComponent<Node>();
-    //    }
-    //}
 }

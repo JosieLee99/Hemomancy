@@ -7,27 +7,23 @@ public class AStarManager : MonoBehaviour
 {
     public static AStarManager Instance;
 
-    public NoiseGrid noiseGrid;
+    public InitializeMap initializeMap;
 
     [SerializeField] private int gridWidth = 100;
     [SerializeField] private int gridHeight = 100;
     [SerializeField] private float cellWidth = 1f;
     [SerializeField] private float cellHeight = 1f;
     [SerializeField] private bool visualiseGrid = true;
-    //[SerializeField] private bool showTexts;
 
     private bool pathGenerated;
 
     private Dictionary<Vector2, Cell> cells;
-
-    private Dictionary<Vector2, Cell> availableCells;
 
     [SerializeField] public List<Vector2> availableVectors;
 
     [SerializeField] public List<Vector2> cellsToSearch;
     [SerializeField] public List<Vector2> searchedCells;
     [SerializeField] public List<Vector2> finalPath;
-    [SerializeField] public List<Vector2> finalPathTemp;
 
     [SerializeField] public NPC[] npcs;
 
@@ -47,32 +43,36 @@ public class AStarManager : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.R))
         {
-            if (availableVectors.Count > 0)
-            {
-                availableVectors.Clear();
-            }
+            StartPathfinding();
 
-            GenerateGrid();
-
-            foreach (NPC npc in npcs)
-            {
-                npc.path = RandomizePath(new Vector2(npc.gameObject.transform.position.x, npc.gameObject.transform.position.y));
-            }
-
-            //int randStart = Random.Range(0, availableVectors.Count);
-
-            //RandomizePath(new Vector2(availableVectors[randStart].x, availableVectors[randStart].y));
+            //if (availableVectors.Count > 0)
+            //{
+            //    availableVectors.Clear();
+            //}
+            //foreach (NPC npc in npcs)
+            //{
+            //    GenerateGrid();
+            //
+            //    npc.path = RandomizePath(new Vector2(npc.gameObject.transform.position.x, npc.gameObject.transform.position.y));
+            //}
         }
-
-        //if (availableVectors.Count > 0)
-        //{
-        //    availableVectors.Clear();
-        //}
-
-        //GenerateGrid();
     }
 
-    private void GenerateGrid()
+    public void StartPathfinding()
+    {
+        if (availableVectors.Count > 0)
+        {
+            availableVectors.Clear();
+        }
+        foreach (NPC npc in npcs)
+        {
+            GenerateGrid();
+
+            npc.path = RandomizePath(new Vector2(npc.gameObject.transform.position.x, npc.gameObject.transform.position.y));
+        }
+    }
+
+    public void GenerateGrid()
     {
         cells = new Dictionary<Vector2, Cell>();
 
@@ -89,7 +89,7 @@ public class AStarManager : MonoBehaviour
         {
             for (int j = 0; j < gridHeight; j++)
             {
-                if (noiseGrid.tilemap.GetTile(new Vector3Int(i, j, 0)) != noiseGrid.grass1 && noiseGrid.tilemap.GetTile(new Vector3Int(i, j, 0)) != noiseGrid.grass2 && noiseGrid.tilemap.GetTile(new Vector3Int(i, j, 0)) != noiseGrid.grass3)
+                if (initializeMap.tilemap.GetTile(new Vector3Int(i, j, 0)) != initializeMap.grass1 && initializeMap.tilemap.GetTile(new Vector3Int(i, j, 0)) != initializeMap.grass2 && initializeMap.tilemap.GetTile(new Vector3Int(i, j, 0)) != initializeMap.grass3)
                 {
                     Debug.Log("THIS IS A WALL");
                     pos = new Vector2(i, j);
@@ -106,38 +106,22 @@ public class AStarManager : MonoBehaviour
 
     public List<Vector2> RandomizePath(Vector2 startPos)
     {
-        //foreach (KeyValuePair<Vector2, Cell> cell in cells)
-        //{
-        //    if (!cell.Value.isWall)
-        //    {
-        //        Vector2 cellPos = new Vector2(cell.Key.x, cell.Key.y);
-        //        
-        //        availableCells.Add(cellPos, new Cell(cellPos));
-        //
-        //        availableVectors.Add(cellPos);
-        //    }
-        //}
+        int randEnd = Random.Range(0, availableVectors.Count);
 
-            //int randStart = Random.Range(0, availableVectors.Count);
-            int randEnd = Random.Range(0, availableVectors.Count);
+        FindPath(startPos, new Vector2(availableVectors[randEnd].x, availableVectors[randEnd].y));
 
-            //FindPath(new Vector2(availableVectors[randStart].x, availableVectors[randStart].y), new Vector2(availableVectors[randEnd].x, availableVectors[randEnd].y));
-            FindPath(startPos, new Vector2(availableVectors[randEnd].x, availableVectors[randEnd].y));
+        finalPath.Reverse();
+        finalPath.RemoveAt(0);
 
-            //for (int i = finalPathTemp.Count; i > 0; i--)
-            //{
-            //    Debug.Log("Hello");
-            //    finalPath.Add(finalPathTemp[i]);
-            //}
-
-            finalPath.Reverse();
-
-            return finalPath;
+        return finalPath;
     }
 
 
-    private void FindPath(Vector2 startPos, Vector2 endPos)
+    public void FindPath(Vector2 startPos, Vector2 endPos)
     {
+        startPos.x = Mathf.Round(startPos.x);
+        startPos.y = Mathf.Round(startPos.y);
+
         searchedCells = new List<Vector2>();
         cellsToSearch = new List<Vector2>() { startPos };
         finalPath = new List<Vector2>();
@@ -182,7 +166,7 @@ public class AStarManager : MonoBehaviour
         }
     }
 
-    private void SearchCellNeighbors(Vector2 cellPos, Vector2 endPos)
+    public void SearchCellNeighbors(Vector2 cellPos, Vector2 endPos)
     {
         for(float x = cellPos.x - cellWidth; x <= cellWidth + cellPos.x; x += cellWidth)
         {
@@ -213,7 +197,7 @@ public class AStarManager : MonoBehaviour
         }
     }
 
-    private int GetDistance(Vector3 pos1, Vector2 pos2)
+    public int GetDistance(Vector3 pos1, Vector2 pos2)
     {
         Vector2Int dist = new Vector2Int(Mathf.Abs((int)pos1.x - (int)pos2.x), Mathf.Abs((int)pos1.y - (int)pos2.y));
 
@@ -225,7 +209,7 @@ public class AStarManager : MonoBehaviour
         return lowest * 14 + horizontalMovesRequired * 10;
     }
 
-    private void OnDrawGizmos()
+    public void OnDrawGizmos()
     {
         if (!visualiseGrid || cells == null)
         {
@@ -247,8 +231,6 @@ public class AStarManager : MonoBehaviour
             {
                 Gizmos.color = Color.magenta;
             }
-
-            //float gizmoSize = showTexts ? 0.2f : 1;
 
             Gizmos.DrawCube(kvp.Key + (Vector2)transform.position, new Vector3(cellWidth, cellHeight));
         }

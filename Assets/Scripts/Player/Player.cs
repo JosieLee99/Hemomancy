@@ -38,7 +38,7 @@ public class Player : MonoBehaviour
         currentState.OnCollisionEnter2D(this);
     }
 
-    void Update()
+    void FixedUpdate()
     {
         currentState.UpdateState(this, worldManager);
     }

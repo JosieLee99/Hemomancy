@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class NPCIdleState : NPCState
 {
-    public override void EnterState(NPC npc, Player player)
+    public override void EnterState(NPC npc, Player player, WorldManager worldManager)
     {
         //Debug.Log("NPC:IDLE");
     }
 
-    public override void UpdateState(NPC npc)
+    public override void UpdateState(NPC npc, WorldManager worldManager)
     {
 
     }

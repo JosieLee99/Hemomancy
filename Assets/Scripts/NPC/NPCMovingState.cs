@@ -7,7 +7,7 @@ public class NPCMovingState : NPCState
     public float moveSpeed = 5f;
     public bool shouldMove = false;
 
-    public override void EnterState(NPC npc, Player player)
+    public override void EnterState(NPC npc, Player player, WorldManager worldManager)
     {
         if (Vector3.Distance(player.gameObject.transform.position, npc.gameObject.transform.position) <= 2.5f)
         {
@@ -16,8 +16,9 @@ public class NPCMovingState : NPCState
 
             playerUnit.currentHP -= npcUnit.damage;
 
-
+            worldManager.SwitchState(worldManager.playerTurnState);
             npc.SwitchState(npc.npcIdleState);
+
         }
         else
         {
@@ -25,29 +26,14 @@ public class NPCMovingState : NPCState
         }
     }
 
-    public override void UpdateState(NPC npc)
+    public override void UpdateState(NPC npc, WorldManager worldManager)
     {
-        //Node[] nodes = npc.nodes;
-        //
-        //while (path == null || path.Count == 0)
+        //if (Input.GetKeyDown(KeyCode.T))
         //{
-        //    path = AStarManager.Instance.GeneratePath(currentNode, nodes[Random.Range(0, nodes.Length)]);
+        //    shouldMove = true;
         //}
 
-        //while (npc.path == null || npc.path.Count == 0)
-        //{
-        //    npc.path = AStarManager.Instance.RandomizePath(new Vector2(npc.gameObject.transform.position.x, npc.gameObject.transform.position.y));
-        //}
-
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            shouldMove = true;
-        }
-
-        //currentNode = npc.currentNode;
-        //path = npc.path;
-
-        Move(npc);
+        Move(npc, worldManager);
     }
 
     public override void OnCollisionEnter2D(NPC npc)
@@ -55,51 +41,7 @@ public class NPCMovingState : NPCState
 
     }
 
-    //public void CreatePath(NPC npc)
-    //{
-    //    if (shouldMove == true)
-    //    {
-    //        if (path.Count > 0)
-    //        {
-    //            foreach (Node node in path)
-    //            {
-    //                int i = 0;
-    //
-    //                if (i > 0)
-    //                {
-    //                    path.RemoveAt(i);
-    //                }
-    //                else
-    //                {
-    //                    i++;
-    //                }
-    //            }
-    //
-    //            int x = 0;
-    //            npc.transform.position = Vector3.MoveTowards(npc.transform.position, new Vector3(path[x].transform.position.x, path[x].transform.position.y, -2), moveSpeed * Time.deltaTime);
-    //
-    //            if (Vector2.Distance(npc.transform.position, path[x].transform.position) < 0.1f)
-    //            {
-    //                currentNode = path[x];
-    //                path.RemoveAt(x);
-    //
-    //                shouldMove = false;
-    //
-    //                npc.SwitchState(npc.npcIdleState);
-    //            }
-    //        }
-    //    }
-    //}
-
-    //public void OnTriggerEnter2D(Collider2D collider)
-    //{
-    //    if (collider.gameObject.tag == "Node")
-    //    {
-    //        currentNode = collider.gameObject.GetComponent<Node>();
-    //    }
-    //}
-
-    public void Move(NPC npc)
+    public void Move(NPC npc, WorldManager worldManager)
     {
         if (shouldMove == true)
         {
@@ -120,16 +62,19 @@ public class NPCMovingState : NPCState
                 }
 
                 int x = 0;
-                npc.gameObject.transform.position = Vector3.MoveTowards(npc.gameObject.transform.position, new Vector3(npc.path[x].x, npc.path[x].y, -2), 3 * Time.deltaTime);
+                npc.gameObject.transform.position = Vector3.MoveTowards(npc.gameObject.transform.position, new Vector3(npc.path[x].x, npc.path[x].y, -2), moveSpeed * Time.deltaTime);
 
-                if (Vector2.Distance(npc.gameObject.transform.position, npc.path[x]) < 0.1f)
+                if (Vector2.Distance(npc.gameObject.transform.position, npc.path[x]) < 0.01f)
                 {
                     Debug.Log("1 tile traveled");
 
-                    //currentNode = npc.path[x];
                     npc.path.RemoveAt(x);
 
                     shouldMove = false;
+
+                    worldManager.SwitchState(worldManager.playerTurnState);
+                    npc.SwitchState(npc.npcIdleState);
+
                 }
             }
         }

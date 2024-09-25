@@ -8,7 +8,14 @@ public class MoveAllState : WorldState
     {
         foreach (NPC npc in npcs)
         {
-            npc.SwitchState(npc.npcMovingState);
+            if (npc.path.Count > 0)
+            {
+                npc.SwitchState(npc.npcMovingState);
+            }
+            else
+            {
+                worldManager.SwitchState(worldManager.playerTurnState);
+            }
         }
     }
 
